@@ -1,8 +1,6 @@
 'use client'
 
 import { type LucideIcon } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { cn } from '../lib/utils'
 import { ScrollArea } from './scroll-area'
 import { Separator } from './separator'
@@ -38,12 +36,21 @@ export interface SidebarBranding {
   logo?: React.ReactNode
 }
 
+// Navigation dependencies to be injected by the consuming app
+export interface NavigationDeps {
+  Link: React.ComponentType<any>
+  usePathname: () => string
+}
+
 export interface SidebarProps {
   navGroups: NavGroup[]
   user?: SidebarUser | null
   branding: SidebarBranding
   isLoadingUser?: boolean
   onLogout?: () => void
+  
+  // Navigation dependencies (required for framework-agnostic usage)
+  navigation: NavigationDeps
   
   // Optional permission check - if provided, will filter nav items
   checkModuleAccess?: (module: string) => boolean
@@ -123,12 +130,14 @@ function NavItemComponent({
   onNavigate,
   checkModuleAccess,
   variant = 'light',
+  Link,
 }: {
   item: NavItem
   pathname: string
   onNavigate?: () => void
   checkModuleAccess?: (module: string) => boolean
   variant?: 'light' | 'dark'
+  Link: React.ComponentType<any>
 }) {
   // Check permission if module is specified
   const hasAccess = item.module && checkModuleAccess ? checkModuleAccess(item.module) : true
@@ -157,6 +166,7 @@ function NavItemComponent({
 
   return (
     <Link
+      to={item.href}
       href={item.href}
       onClick={handleClick}
       aria-current={isActive ? 'page' : undefined}
@@ -191,12 +201,14 @@ function IconNavItem({
   onNavigate,
   checkModuleAccess,
   variant = 'light',
+  Link,
 }: {
   item: NavItem
   pathname: string
   onNavigate?: () => void
   checkModuleAccess?: (module: string) => boolean
   variant?: 'light' | 'dark'
+  Link: React.ComponentType<any>
 }) {
   const hasAccess = item.module && checkModuleAccess ? checkModuleAccess(item.module) : true
 
@@ -222,6 +234,7 @@ function IconNavItem({
 
   return (
     <Link
+      to={item.href}
       href={item.href}
       onClick={handleClick}
       aria-current={isActive ? 'page' : undefined}
@@ -243,12 +256,14 @@ function NavGroupComponent({
   onNavigate,
   checkModuleAccess,
   variant,
+  Link,
 }: {
   group: NavGroup
   pathname: string
   onNavigate?: () => void
   checkModuleAccess?: (module: string) => boolean
   variant?: 'light' | 'dark'
+  Link: React.ComponentType<any>
 }) {
   // Filter items by permissions
   const visibleItems = group.items.filter((item) => {
@@ -281,6 +296,7 @@ function NavGroupComponent({
             onNavigate={onNavigate}
             checkModuleAccess={checkModuleAccess}
             variant={variant}
+            Link={Link}
           />
         ))}
       </div>
@@ -294,6 +310,7 @@ export function Sidebar({
   branding,
   isLoadingUser = false,
   onLogout,
+  navigation,
   checkModuleAccess,
   companySelector,
   storeSelector,
@@ -305,7 +322,8 @@ export function Sidebar({
   renderRoleBadge,
   onNavigate,
 }: SidebarProps) {
-  const pathname = usePathname()
+  const pathname = navigation.usePathname()
+  const Link = navigation.Link
 
   const UserAvatar = renderUserAvatar
     ? () => renderUserAvatar(user!)
@@ -333,6 +351,7 @@ export function Sidebar({
       >
         <div className="flex h-full flex-col items-center py-4">
           <Link
+            to="/"
             href="/"
             className={cn(
               'mb-4 flex h-10 w-10 items-center justify-center rounded-xl text-xs font-bold text-white',
@@ -354,6 +373,7 @@ export function Sidebar({
                       onNavigate={onNavigate}
                       checkModuleAccess={checkModuleAccess}
                       variant={variant}
+                      Link={Link}
                     />
                   ))}
                 </div>
@@ -363,6 +383,7 @@ export function Sidebar({
           <div className="pt-3">
             {user && (
               <Link
+                to="/account"
                 href="/account"
                 onClick={onNavigate}
                 aria-label="Ver mi cuenta"
@@ -420,6 +441,7 @@ export function Sidebar({
                     onNavigate={onNavigate}
                     checkModuleAccess={checkModuleAccess}
                     variant={variant}
+                    Link={Link}
                   />
                   {groupIndex < navGroups.length - 1 && <Separator className="my-4" />}
                 </div>
@@ -446,6 +468,7 @@ export function Sidebar({
             ) : user ? (
               <div className="space-y-3">
                 <Link
+                  to="/account"
                   href="/account"
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors',

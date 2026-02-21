@@ -1,5 +1,6 @@
 // Component Library Exports
-// CSS is imported via sideEffects in package.json
+// Import styles so Vite can bundle them
+import './styles/main.scss'
 
 export * from "./components/alert";
 export * from "./components/alert-dialog";
