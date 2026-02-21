@@ -1,4 +1,5 @@
-import "./styles/tokens.css";
+// Component Library Exports
+// CSS is imported via sideEffects in package.json
 
 export * from "./components/alert";
 export * from "./components/alert-dialog";
