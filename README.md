@@ -1,16 +1,17 @@
 # @multisystem/ui
 
-Shared UI component library for the multisystem monorepo.
+Shared UI component library for multisystem projects.
 
 ## Installation
 
-This package is intended for internal use within the monorepo and is auto-linked via pnpm workspaces.
+Each multisystem project installs `@multisystem/ui` independently: from GitHub releases in production (e.g. `github:andcast77/multisystem-components#v1.0.0`) or via `file:../component-library` for local development when working inside the container folder.
 
 ```bash
 # Install dependencies in each app
 cd hub && pnpm install
 cd shopflow && pnpm install
 cd workify && pnpm install
+cd techservices && pnpm install
 ```
 
 ## Usage
